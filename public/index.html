@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VideoGrab — Descarga Videos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <div class="logo">
+        <svg aria-label="VideoGrab" width="34" height="34" viewBox="0 0 34 34" fill="none">
+          <rect width="34" height="34" rx="9" fill="var(--color-primary)"/>
+          <polygon points="13,10 25,17 13,24" fill="white"/>
+          <rect x="8" y="10" width="3" height="14" rx="1.5" fill="white"/>
+        </svg>
+        <span class="logo__text">VideoGrab</span>
+      </div>
+      <button class="theme-toggle" data-theme-toggle aria-label="Cambiar tema">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="hero container">
+      <h1 class="hero__title">Descarga videos de<br/><span class="accent">redes sociales</span></h1>
+      <p class="hero__sub">Pega el enlace y descarga en segundos. Sin registros, sin límites.</p>
+
+      <div class="platforms">
+        <span class="platform-badge"><img src="https://cdn.simpleicons.org/instagram/white" width="14" height="14" alt="Instagram" loading="lazy"/> Instagram</span>
+        <!-- <span class="platform-badge"><img src="https://cdn.simpleicons.org/youtube/white" width="14" height="14" alt="YouTube" loading="lazy"/> YouTube</span>
+        <span class="platform-badge"><img src="https://cdn.simpleicons.org/tiktok/white" width="14" height="14" alt="TikTok" loading="lazy"/> TikTok</span>
+        <span class="platform-badge"><img src="https://cdn.simpleicons.org/facebook/white" width="14" height="14" alt="Facebook" loading="lazy"/> Facebook</span>
+        <span class="platform-badge"><img src="https://cdn.simpleicons.org/linkedin/white" width="14" height="14" alt="LinkedIn" loading="lazy"/> LinkedIn</span> -->
+      </div>
+
+      <div class="input-card">
+        <label class="input-label" for="videoUrl">Enlace del video</label>
+        <div class="input-group">
+          <input type="url" id="videoUrl" class="url-input" placeholder="https://www.instagram.com/reel/..." autocomplete="off" spellcheck="false"/>
+        </div>
+        <div class="btn-row">
+          <button id="infoBtn" class="btn btn-secondary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Vista previa
+          </button>
+          <button id="downloadBtn" class="btn btn-primary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Descargar
+          </button>
+        </div>
+
+        <div id="videoPreview" class="video-preview hidden">
+          <img id="previewThumb" class="preview-thumb" src="" alt="Thumbnail" loading="lazy"/>
+          <div class="preview-info">
+            <p id="previewTitle" class="preview-title"></p>
+            <p id="previewMeta"  class="preview-meta"></p>
+          </div>
+        </div>
+
+        <div id="statusBox" class="status-box hidden"></div>
+      </div>
+
+      <div id="resultCard" class="result-card hidden">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <p>¡Video listo para descargar!</p>
+        <a id="downloadLink" class="btn btn-success" href="#" download>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Descargar ahora
+        </a>
+      </div>
+    </section>
+
+    <section class="how-it-works">
+      <div class="container">
+        <h2>¿Cómo funciona?</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step__num">1</div>
+            <h3>Copia el enlace</h3>
+            <p>Abre la red social, selecciona el video y copia su URL.</p>
+          </div>
+          <div class="step">
+            <div class="step__num">2</div>
+            <h3>Pégalo aquí</h3>
+            <p>Pega el enlace y usa <strong>Vista previa</strong> para verificarlo.</p>
+          </div>
+          <div class="step">
+            <div class="step__num">3</div>
+            <h3>Descarga</h3>
+            <p>Haz clic en <strong>Descargar</strong> y tendrás el video en segundos.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="container">VideoGrab &copy; 2026 — Práctica Calificada S04 · Contenedores</p>
+  </footer>
+
+  <script src="./js/main.js"></script>
+</body>
+</html>

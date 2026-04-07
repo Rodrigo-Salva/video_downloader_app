@@ -1,0 +1,8 @@
+node_modules/
+downloads/
+.env
+.git
+.gitignore
+*.md
+*.log
+.vscode/
