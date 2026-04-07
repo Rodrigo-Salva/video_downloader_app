@@ -1,6 +1,6 @@
 # 🎬 VideoGrab — Descargador de Videos para Redes Sociales
 
-Aplicación web con **Node.js + Express** para descargar videos de Instagram, YouTube, TikTok, Facebook y LinkedIn. Todo corre dentro del contenedor, por lo que solo es necesario tener Docker instalado. [code_file:11]
+Aplicación web con **Node.js + Express** para descargar videos de Instagram, YouTube, TikTok, Facebook y LinkedIn. Todo corre dentro del contenedor, por lo que solo es necesario tener Docker instalado.
 
 ---
 
@@ -8,15 +8,15 @@ Aplicación web con **Node.js + Express** para descargar videos de Instagram, Yo
 
 | Herramienta | Versión | Verificar |
 |---|---|---|
-| Docker | 24.x o superior | `docker --version` [code_file:11] |
+| Docker | 24.x o superior | `docker --version` |
 
-> Node.js, yt-dlp y ffmpeg se instalan automáticamente dentro del contenedor. [code_file:11]
+> Node.js, yt-dlp y ffmpeg se instalan automáticamente dentro del contenedor.
 
 ---
 
 ## 📁 Estructura del proyecto
 
-```text
+```
 video-downloader/
 ├── src/
 │   ├── app.js                  ← Servidor Express
@@ -31,118 +31,137 @@ video-downloader/
 ├── .dockerignore
 ├── .gitignore
 ├── package.json
-├── Dockerfile                  ← Imagen base
-├── Dockerfile.optimizado       ← Imagen optimizada
-└── Dockerfile.multistage       ← Imagen multi-stage
+├── Dockerfile                  ← Imagen base node:20
+├── Dockerfile.optimizado       ← Alpine + usuario no-root + healthcheck
+└── Dockerfile.multistage       ← Build en dos etapas (deps + runner)
 ```
 
 ---
 
-## 🐳 Dockerfile base
+## 🚀 Instalación y uso
 
-El archivo `Dockerfile` crea una imagen funcional basada en `node:20`, instala dependencias, copia la aplicación completa y expone el puerto 3000. [code_file:11]
+### Paso 1 — Clonar el repositorio
 
-### Construir imagen base
+```bash
+git clone https://github.com/Rodrigo-Salva/video_downloader_app.git
+cd video_downloader_app
+```
+
+### Paso 2 — Construir la imagen Docker
 
 ```bash
 docker build -t video-downloader:v1.0 .
 ```
 
-### Ejecutar contenedor base
+### Paso 3 — Correr el contenedor
 
 ```bash
 docker run -d -p 3000:3000 --name videograb video-downloader:v1.0
 ```
 
-### Acceder a la app
+### Paso 4 — Abrir en el navegador
 
-```text
+```
 http://localhost:3000
+```
+
+**¡Listo! La app está funcionando.** 🎉
+
+---
+
+## 🐳 Dockerfile base
+
+El archivo `Dockerfile` crea una imagen funcional basada en `node:20` (Debian). Instala automáticamente `ffmpeg` y `yt-dlp`, copia la aplicación y expone el puerto 3000.
+
+```bash
+# Construir
+docker build -t video-downloader:v1.0 .
+
+# Ejecutar
+docker run -d -p 3000:3000 --name videograb video-downloader:v1.0
 ```
 
 ---
 
 ## 🐳 Dockerfile.optimizado
 
-El archivo `Dockerfile.optimizado` usa `node:20-alpine`, instala solo lo necesario, corre con usuario no-root y agrega `HEALTHCHECK`, por lo que mejora seguridad y reduce tamaño respecto al Dockerfile base. [code_file:11]
+El archivo `Dockerfile.optimizado` usa `node:20-alpine`. Mejora seguridad y reduce tamaño respecto al base al incluir usuario no-root y `HEALTHCHECK`.
 
-### Construir imagen optimizada
+**Mejoras:**
+- Imagen Alpine (menor tamaño)
+- Usuario no-root `appuser`
+- `HEALTHCHECK` cada 30 segundos
+- Solo dependencias de producción (`npm ci --only=production`)
 
 ```bash
+# Construir
 docker build -f Dockerfile.optimizado -t video-downloader:v1.1-alpine .
-```
 
-### Ejecutar contenedor optimizado
-
-```bash
+# Ejecutar
 docker run -d -p 3000:3000 --name videograb-alpine video-downloader:v1.1-alpine
-```
-
-### Acceder a la app
-
-```text
-http://localhost:3000
 ```
 
 ---
 
 ## 🐳 Dockerfile.multistage
 
-El archivo `Dockerfile.multistage` utiliza una construcción en dos etapas: una para instalar dependencias y otra para ejecutar solo lo necesario, logrando una imagen final más limpia y ligera. [code_file:11]
+El archivo `Dockerfile.multistage` usa una construcción en dos etapas: la primera instala dependencias (`deps`) y la segunda solo copia lo necesario para ejecutar (`runner`), logrando la imagen más pequeña y limpia.
 
-### Construir imagen multistage
+**Etapas:**
+- `deps` — instala dependencias de Node.js
+- `runner` — imagen final sin herramientas de build
 
 ```bash
+# Construir
 docker build -f Dockerfile.multistage -t video-downloader:v1.2-multistage .
-```
 
-### Ejecutar contenedor multistage
-
-```bash
+# Ejecutar
 docker run -d -p 3000:3000 --name videograb-multistage video-downloader:v1.2-multistage
-```
-
-### Acceder a la app
-
-```text
-http://localhost:3000
 ```
 
 ---
 
 ## 📊 Comparación de imágenes
 
-Las tres imágenes cumplen la misma función, pero fueron construidas con enfoques diferentes para comparar tamaño, seguridad y optimización. [file:1][code_file:11]
+| Archivo | Base | No-root | Healthcheck | Multi-stage |
+|---|---|---|---|---|
+| `Dockerfile` | `node:20` | ❌ | ❌ | ❌ |
+| `Dockerfile.optimizado` | `node:20-alpine` | ✅ | ✅ | ❌ |
+| `Dockerfile.multistage` | `node:20-alpine` | ✅ | ✅ | ✅ |
 
-| Archivo | Características |
-|---|---|
-| `Dockerfile` | Imagen base, más simple de entender y construir. [code_file:11] |
-| `Dockerfile.optimizado` | Usa Alpine, usuario no-root y healthcheck. [code_file:11] |
-| `Dockerfile.multistage` | Usa varias etapas para reducir tamaño final. [code_file:11] |
-
-### Ver tamaños
+### Comparar tamaños
 
 ```bash
 docker images | grep video-downloader
+```
+
+Resultado esperado:
+
+```
+video-downloader   v1.0               ~900MB   node:20 Debian
+video-downloader   v1.1-alpine        ~180MB   node:20-alpine
+video-downloader   v1.2-multistage    ~150MB   node:20-alpine optimizado
 ```
 
 ---
 
 ## ⚙️ Variables de entorno
 
-Las variables de entorno para Docker están definidas con `ENV` dentro de los Dockerfiles, por lo que el contenedor funciona sin depender del archivo `.env` al ejecutarse. [code_file:11]
+Definidas con `ENV` en cada Dockerfile. El contenedor funciona sin depender del archivo `.env`.
 
 | Variable | Valor | Descripción |
 |---|---|---|
-| `PORT` | `3000` | Puerto del servidor. [code_file:11] |
-| `DOWNLOADS_PATH` | `/app/downloads` | Ruta donde se guardan los videos. [code_file:11] |
-| `MAX_FILE_AGE_MINUTES` | `30` | Tiempo de vida de archivos descargados. [code_file:11] |
+| `PORT` | `3000` | Puerto del servidor |
+| `DOWNLOADS_PATH` | `/app/downloads` | Ruta donde se guardan los videos |
+| `MAX_FILE_AGE_MINUTES` | `30` | Minutos antes de limpiar archivos descargados |
 
-### Verificarlas dentro del contenedor
+Verificar dentro del contenedor:
 
 ```bash
 docker exec videograb printenv | grep -E "PORT|DOWNLOADS|MAX_FILE"
 ```
+
+> El archivo `.env` se usa únicamente para desarrollo local con `npm run dev`.
 
 ---
 
@@ -152,10 +171,10 @@ docker exec videograb printenv | grep -E "PORT|DOWNLOADS|MAX_FILE"
 # Ver contenedores en ejecución
 docker ps
 
-# Ver logs
+# Ver logs en tiempo real
 docker logs -f videograb
 
-# Ver archivos descargados
+# Ver archivos descargados dentro del contenedor
 docker exec videograb ls /app/downloads
 
 # Detener contenedor
@@ -167,13 +186,10 @@ docker rm videograb
 
 ---
 
-## 🔄 Reconstrucción
-
-Si haces cambios en el proyecto, debes detener el contenedor anterior, reconstruir la imagen y volver a ejecutar. [code_file:11]
+## 🔄 Reconstruir después de cambios
 
 ```bash
-docker stop videograb
-docker rm videograb
+docker stop videograb && docker rm videograb
 docker build -t video-downloader:v1.0 .
 docker run -d -p 3000:3000 --name videograb video-downloader:v1.0
 ```
@@ -182,38 +198,43 @@ docker run -d -p 3000:3000 --name videograb video-downloader:v1.0
 
 ## 🌍 Plataformas soportadas
 
-La aplicación fue diseñada para descargar videos desde Instagram, YouTube, TikTok, Facebook y LinkedIn, tal como solicita la práctica calificada. [file:1][code_file:11]
-
 | Plataforma | Ejemplo de URL |
 |---|---|
-| Instagram | `https://www.instagram.com/reel/XXXXX/` [code_file:11] |
+| Instagram | `https://www.instagram.com/reel/XXXXX/` |
 ---
 
 ## 🔧 Solución de problemas
 
-Si el puerto 3000 ya está en uso, puedes cerrar el proceso o usar otro puerto, por ejemplo `3001:3000`. [code_file:11]
+### Puerto 3000 en uso
 
 ```bash
-# Ver qué usa el puerto 3000
+# Ver qué proceso usa el puerto
 netstat -ano | findstr :3000
 
-# Matar proceso
+# Matar el proceso
 taskkill /f /pid <PID>
 
-# O correr en otro puerto
+# O usar otro puerto directamente
 docker run -d -p 3001:3000 --name videograb video-downloader:v1.0
+# Abrir: http://localhost:3001
 ```
 
-Para revisar errores del contenedor, usa los logs. [code_file:11]
+### Ver errores del contenedor
 
 ```bash
 docker logs videograb
+```
+
+### Correr en modo interactivo para debug
+
+```bash
+docker run -it -p 3000:3000 --name videograb video-downloader:v1.0
 ```
 
 ---
 
 ## 👤 Autor
 
-**Rodrigo Salva**  
-Curso: Desarrollo de Soluciones en la Nube — Contenedores  
+**Rodrigo Salva**
+Curso: Desarrollo de Soluciones en la Nube — Contenedores
 Institución: TECSUP · Ciclo 2026-I
