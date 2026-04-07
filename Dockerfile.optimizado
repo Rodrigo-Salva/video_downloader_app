@@ -19,6 +19,11 @@ RUN mkdir -p downloads && \
 
 USER appuser
 
+# Variables de entorno
+ENV PORT=3000
+ENV DOWNLOADS_PATH=/app/downloads
+ENV MAX_FILE_AGE_MINUTES=30
+
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s \
